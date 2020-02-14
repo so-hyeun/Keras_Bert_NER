@@ -13,8 +13,11 @@
 ### 2. 목적
 
 #### 1) BERT모델을 이용하여 BIO tagging data로 fine-tuning 
+
 : layer 하나를 추가하여 다양한 NLP task를 수행할 수 있는 bert모델의 특성을 이해하고, 직접 키워드 추출이 가능한 layer를 구현해본다.
+
 #### 2) 기존의 biobert는 tensorflow로 이루어져 있어 코드를 이해하는데 어려움 多 
+
  : 이를 keras로 수정하여 코드 이해도를 높인다.
 
 
@@ -42,11 +45,11 @@
 ##### **1. _read_data(input_fille)**
 
 - 본래 data를 읽어와 max_sequence_len(30) 길이의 문장들로 잘라준다
-  
+
   : [문장, labels] 형식의 examples 생성
-  
+
   : 여기서, BIO 중 BI가 갈라지지 않도록 **pop() 함수**를 이용한다.
-  
+
   ```python
   def _read_data(input_file):
     with open(input_file) as f:
@@ -91,74 +94,74 @@
 - 각각의 example들을 **WordPieceTokenizer**로 토큰화
 
 - For example:
+      input = "unaffable"
+
+  ​    output = ["un", "##aff", "##able"]
+
+   **<tokenizer의 WordpieceTokenizer 부분>**
+
+  ```python
+  class WordpieceTokenizer(object):
+    """Runs WordPiece tokenziation."""
+  
+    def __init__(self, vocab, unk_token="[UNK]", max_input_chars_per_word=200):
+      self.vocab = vocab
+      self.unk_token = unk_token
+      self.max_input_chars_per_word = max_input_chars_per_word
+  
+    def tokenize(self, text):
+      """Tokenizes a piece of text into its word pieces.
+      This uses a greedy longest-match-first algorithm to perform tokenization
+      using the given vocabulary.
+      For example:
         input = "unaffable"
-    
-    ​    output = ["un", "##aff", "##able"]
-    
-     **<tokenizer의 WordpieceTokenizer 부분>**
-    
-    ```python
-    class WordpieceTokenizer(object):
-      """Runs WordPiece tokenziation."""
-    
-      def __init__(self, vocab, unk_token="[UNK]", max_input_chars_per_word=200):
-        self.vocab = vocab
-        self.unk_token = unk_token
-        self.max_input_chars_per_word = max_input_chars_per_word
-    
-      def tokenize(self, text):
-        """Tokenizes a piece of text into its word pieces.
-        This uses a greedy longest-match-first algorithm to perform tokenization
-        using the given vocabulary.
-        For example:
-          input = "unaffable"
-          output = ["un", "##aff", "##able"]
-        Args:
-          text: A single token or whitespace separated tokens. This should have
-            already been passed through `BasicTokenizer.
-        Returns:
-          A list of wordpiece tokens.
-        """
-    
-        text = convert_to_unicode(text)
-    
-        output_tokens = []
-        for token in whitespace_tokenize(text):
-          chars = list(token)
-          if len(chars) > self.max_input_chars_per_word:
-            output_tokens.append(self.unk_token)
-            continue
-    
-          is_bad = False
-          start = 0
-          sub_tokens = []
-          while start < len(chars):
-            end = len(chars)
-            cur_substr = None
-            while start < end:
-              substr = "".join(chars[start:end])
-              if start > 0:
-                substr = "##" + substr
-              if substr in self.vocab:
-                cur_substr = substr
-                break
-              end -= 1
-            if cur_substr is None:
-              is_bad = True
+        output = ["un", "##aff", "##able"]
+      Args:
+        text: A single token or whitespace separated tokens. This should have
+          already been passed through `BasicTokenizer.
+      Returns:
+        A list of wordpiece tokens.
+      """
+  
+      text = convert_to_unicode(text)
+  
+      output_tokens = []
+      for token in whitespace_tokenize(text):
+        chars = list(token)
+        if len(chars) > self.max_input_chars_per_word:
+          output_tokens.append(self.unk_token)
+          continue
+  
+        is_bad = False
+        start = 0
+        sub_tokens = []
+        while start < len(chars):
+          end = len(chars)
+          cur_substr = None
+          while start < end:
+            substr = "".join(chars[start:end])
+            if start > 0:
+              substr = "##" + substr
+            if substr in self.vocab:
+              cur_substr = substr
               break
-            sub_tokens.append(cur_substr)
-            start = end
-    
-          if is_bad:
-            output_tokens.append(self.unk_token)
-          else:
-            output_tokens.extend(sub_tokens)
-        return output_tokens
-    
-    
-    ```
-    
-    
+            end -= 1
+          if cur_substr is None:
+            is_bad = True
+            break
+          sub_tokens.append(cur_substr)
+          start = end
+  
+        if is_bad:
+          output_tokens.append(self.unk_token)
+        else:
+          output_tokens.extend(sub_tokens)
+      return output_tokens
+  
+  
+  ```
+
+  
 
 **3. convert_single_example(ex_index, example, label_list, max_seq_length,tokenizer)**
 
@@ -199,7 +202,7 @@
 
 ###  NER task를 위한 output layer 구현
 
--  **PAD를 포함한 label이 총 7개**
+- **PAD를 포함한 label이 총 7개**
 
   -> output_layer에서 각 token별로 output크기가 label개수(7개)에 맞게 나오도록 함
 
@@ -223,11 +226,11 @@ def get_bert_finetuning_model(model):
 
 ### Model Summary
 
-![image-20200214140518395](C:\Users\SAMSUNG\AppData\Roaming\Typora\typora-user-images\image-20200214140518395.png)
+![1](C:\Users\SAMSUNG\Pictures\1.PNG)
 
-​                                               
+  
 
-![image-20200214140503017](C:\Users\SAMSUNG\AppData\Roaming\Typora\typora-user-images\image-20200214140503017.png)
+![2](C:\Users\SAMSUNG\Pictures\2.PNG)
 
-   4 Epoch로 했을때 정확도 : 98%
+ 4 Epoch로 했을때 정확도 : 98% 
 
