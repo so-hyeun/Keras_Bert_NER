@@ -171,6 +171,8 @@
 
   **train_y** :  label_ids
 
+  
+
 - 이때, train_y 데이터의 경우 input으로 넣어준 ***target 데이터와 동일한 형태로 맞춰주기 위해 one-hot vector형태로*** 바꿔줌
 
   ```python
@@ -226,11 +228,9 @@ def get_bert_finetuning_model(model):
 
 ### Model Summary
 
-![1](C:\Users\SAMSUNG\Pictures\1.PNG)
+![layer_1](./img/layer_1.PNG)
 
-  
-
-![2](C:\Users\SAMSUNG\Pictures\2.PNG)
+  ![layer_1](./img/layer_2.PNG)
 
  4 Epoch로 했을때 정확도 : 98% 
 
