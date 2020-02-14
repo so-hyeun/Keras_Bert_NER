@@ -223,8 +223,11 @@ def get_bert_finetuning_model(model):
 
 ### Model Summary
 
+![image-20200214140518395](C:\Users\SAMSUNG\AppData\Roaming\Typora\typora-user-images\image-20200214140518395.png)
 
+​                                               
 
+![image-20200214140503017](C:\Users\SAMSUNG\AppData\Roaming\Typora\typora-user-images\image-20200214140503017.png)
 
-
+   4 Epoch로 했을때 정확도 : 98%
 
